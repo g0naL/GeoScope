@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}GeoScope{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('main.static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap desde CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        footer {
+            flex-shrink: 0;
+        }
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            filter: invert(1); /* invierte el color blanco a negro */
+        }
+    </style>
+</head>
+<body class="bg-light text-dark">
+
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="javascript:history.back()" class="nav-link">
+                        ← Volver
+                    </a>
+                </li>
+            </ul>
+            
+
+            <!-- Menú centrado -->
+            <div class="mx-auto position-absolute start-50 translate-middle-x">
+                <ul class="navbar-nav flex-row">
+                    <li class="nav-item px-3"><a class="nav-link" href="/">Inicio</a></li>
+                    <li class="nav-item px-3"><a class="nav-link" href="#">Conflictos</a></li>
+                    <li class="nav-item px-3"><a class="nav-link" href="/mapa">Mapa</a></li>
+                </ul>
+            </div>
+
+            <!-- Menú derecha -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/login">Iniciar sesión</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="container py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-muted py-3">
+        © 2025 GeoScope | André González Alonso
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<!-- CSS -->
+
+<style>
+    .form-control {
+        border: 1px solid #ccc !important;
+        border-radius: 5px;
+    }
+
+    .form-select {
+        border: 1px solid #ccc !important;
+        border-radius: 5px;
+    }
+</style>
