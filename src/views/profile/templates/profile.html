@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-5 bg-light">
+    <div class="container bg-white rounded shadow p-4" style="max-width: 800px;">
+        
+        <!-- Encabezado: Nombre + bandera -->
+        <div class="d-flex align-items-center mb-4">
+            <img src="https://flagcdn.com/w80/{{ country_code|lower }}.png"
+                 alt="{{ user.country }}"
+                 width="48" height="32"
+                 class="me-3 border rounded shadow-sm"
+                 style="object-fit: cover;">
+            <h2 class="mb-0">{{ user.name }}</h2>
+        </div>
+
+        <hr>
+
+        <!-- Sección de datos -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <div>
+                {% if current_user.is_authenticated and current_user.email == user.email %}
+                    <span>{{ user.email }}</span>
+                {% else %}
+                    <em class="text-muted">(privado)</em>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">País</label>
+            <div>{{ user.country }}</div>
+        </div>
+
+        <!-- Botón de editar (solo si es el propio usuario) -->
+        {% if current_user.is_authenticated and current_user.email == user.email %}
+        <div class="mt-4">
+            <a href="/editar-perfil" class="btn btn-outline-primary">Editar perfil</a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

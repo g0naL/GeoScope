@@ -56,7 +56,7 @@
                         <select name="country" class="form-select">
                             <option value="">Selecciona un país</option>
                             {% for code, name in countries %}
-                                <option value="{{ code|lower }}">{{ name }}</option>
+                                <option value="{{ name }}">{{ name }}</option>
                             {% endfor %}
                         </select>
                     </div>

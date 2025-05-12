@@ -3,7 +3,7 @@ import flask_login
 import redis
 import sirope
 from model.UserEntity import UserEntity
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from country_list import countries_for_language
 
 # Creamos el blueprint "auth", como módulo independiente
@@ -27,8 +27,8 @@ def registro():
         pw = flask.request.form["password"]
         country = flask.request.form.get("country") or "unknown"
 
-        if UserEntity.find(srp, email):
-            flask.flash("El usuario ya existe.")
+        if UserEntity.find_by_mail(srp, email):
+            flask.flash("El correo electrónico ya está asociada a otra cuenta.", "danger")
         else:
             UserEntity.create(srp, name, email, pw, country)
             flask.flash("Registro exitoso, ya puedes iniciar sesión.", "success")
@@ -49,16 +49,15 @@ def login():
     if flask.request.method == "POST":
         email = flask.request.form["email"]
         pw = flask.request.form["password"]
-        user = UserEntity.find(srp, email)
+        user = UserEntity.find_by_mail(srp, email)
 
-        if not user or not check_password_hash(user.password_hash, pw):
-            flask.flash("Las credenciales no son válidas.")
+        if not user or not check_password_hash(user.password, pw):
+            flask.flash("Las credenciales no son válidas.", "danger")
         else:
             flask_login.login_user(user)
             return flask.redirect(flask.url_for("main.index"))
 
     return flask.render_template("login.html")
-
 
 @auth_bp.route("/logout")
 @flask_login.login_required

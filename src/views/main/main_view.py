@@ -4,4 +4,4 @@ main_bp = flask.Blueprint("main", __name__, template_folder="templates", static_
 
 @main_bp.route("/")
 def index():
-    return flask.render_template("index.html")
+    return flask.render_template("index.html", is_index=True)
