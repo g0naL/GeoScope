@@ -33,10 +33,42 @@
             <div>{{ user.country }}</div>
         </div>
 
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre de usuario</label>
+            <div>@{{ user.username }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Idioma preferido</label>
+            <div>{{ user.language }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Zona horaria</label>
+            <div>{{ user.timezone }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Biografía</label>
+            <div>{{ user.bio or 'Cri, cri, cri...' }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Miembro desde</label>
+            <div>{{ user.get_created_at() }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Última conexión</label>
+            <div>
+                {{ user.get_last_login() }}
+            </div>
+        </div>
+
         <!-- Botón de editar (solo si es el propio usuario) -->
         {% if current_user.is_authenticated and current_user.email == user.email %}
         <div class="mt-4">
-            <a href="/editar-perfil" class="btn btn-outline-primary">Editar perfil</a>
+            <a href="/editar-perfil/{{ safe_oid }}" class="btn btn-outline-primary">Editar perfil</a>
         </div>
         {% endif %}
 

@@ -1,20 +1,59 @@
-{% extends "base.html" %}
-
-{% block title %}Mapa{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
+<div class="container-fluid py-5 bg-light">
+    <div class="container bg-white rounded shadow p-4">
+        <h2 class="mb-4">Mapa de Conflictos Geopolíticos</h2>
+        <div id="map" class="rounded border shadow-sm" style="height: 600px;"></div>
+    </div>
+</div>
+{% endblock %}
 
-<!-- Flash messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show text-center" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+{% block scripts %}
+<!-- Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
 
+<script>
+    // Inicializar el mapa centrado globalmente
+    var map = L.map('map').setView([20, 0], 2);
 
+    // Capa base
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Ejemplos de elementos en el mapa
+    var marker = L.marker([51.5, -0.09]).addTo(map);
+    marker.bindPopup("<b>Conflicto de ejemplo</b><br>Zona en disputa.").openPopup();
+
+    var circle = L.circle([51.508, -0.11], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 500000
+    }).addTo(map);
+    circle.bindPopup("Zona de influencia");
+
+    var polygon = L.polygon([
+        [51.509, -0.08],
+        [51.503, -0.06],
+        [51.51, -0.047]
+    ]).addTo(map);
+    polygon.bindPopup("Zona en conflicto");
+
+    // Popup al hacer clic
+    var popup = L.popup();
+    map.on('click', function (e) {
+        popup
+            .setLatLng(e.latlng)
+            .setContent("Coordenadas: " + e.latlng.toString())
+            .openOn(map);
+    });
+</script>
 {% endblock %}

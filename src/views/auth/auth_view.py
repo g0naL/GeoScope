@@ -51,9 +51,11 @@ def login():
         pw = flask.request.form["password"]
         user = UserEntity.find_by_mail(srp, email)
 
-        if not user or not check_password_hash(user.password, pw):
+        if not user or not user.check_password(pw):
             flask.flash("Las credenciales no son válidas.", "danger")
         else:
+            user.set_last_login_now()
+            srp.save(user)
             flask_login.login_user(user)
             return flask.redirect(flask.url_for("main.index"))
 

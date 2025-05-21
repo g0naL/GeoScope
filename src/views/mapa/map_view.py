@@ -5,4 +5,4 @@ mapa_bp = flask.Blueprint("mapa", __name__, template_folder="templates", static_
 
 @mapa_bp.route("/mapa", methods=["GET"])
 def mapa():
-    return None
+    return flask.render_template("mapa.html")

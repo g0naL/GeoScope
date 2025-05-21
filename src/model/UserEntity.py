@@ -1,30 +1,51 @@
+import datetime
 import uuid
 import flask_login
 import werkzeug.security as safe
 
 
 class UserEntity(flask_login.UserMixin):
-    def __init__(self, name, email, password, country):
-        self.id = str(uuid.uuid4()) # Usado como user ID para flask login manager, único e incambiable.
+    def __init__(self, name, email, password, country, username=None, language='es', timezone='Europe/Madrid'):
+        self._id = str(uuid.uuid4()) # Usado como user ID para flask login manager, único e incambiable.
         self.name = name
         self.email = email
-        self.password = safe.generate_password_hash(password)
+        self._password = safe.generate_password_hash(password)
         self.country = country
+        self.username = username
+        self.language = language
+        self.timezone = timezone
+        self.bio = "" 
+        self.created_at = datetime.datetime.now()
+        self.last_login = None
 
     def key(self):
         return self.id
     
     @property
     def id(self):
-        return self.id
+        return self._id
     
     @property
     def oid(self):
         return self.__oid__
     
-    @property
-    def safe_oid(self, srp):
-        return srp.safe_from_oid(self.__oid__)
+    def get_safe_oid(self, srp):
+        oid = getattr(self, "__oid__", None)
+        return srp.safe_from_oid(oid) if oid else None
+    
+    def get_created_at(self):
+        return self.created_at.strftime("%d/%m/%Y")
+
+    def get_last_login(self):
+        if self.last_login:
+            return self.last_login.strftime("%d/%m/%Y %H:%M")
+        return "Nunca"
+    
+    def check_password(self,input_password):
+        return safe.check_password_hash(self._password, input_password)
+    
+    def set_last_login_now(self):
+        self.last_login = datetime.datetime.now()
 
     def __eq__(self, other):
         return isinstance(other, UserEntity) and self.email == other.email
