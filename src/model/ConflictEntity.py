@@ -1,23 +1,21 @@
-class ConflictEntity:
-    def __init__(self, title, lat, language, description, url=None, polygon=None):
-        self.title = title
-        self.lat = lat
-        self.language = language
-        self.description = description
-        self.url = url
-        self.polygon = polygon or []
-        self.conversations = []
+class Conflicto:
+    def __init__(self, titulo, paises, color, fillColor, descripcion="",):
+        self.titulo = titulo
+        self.descripcion = descripcion
+        self.paises = paises
+        self.color = color
+        self.fillColor = fillColor
 
-    def add_conversation(self, conversation):
-        self.conversations.append(conversation)
+    def añadir_pais(self, pais):
+        if pais not in self.paises:
+            self.paises.append(pais)
 
-    def to_dict(self):
-        return {
-            "title": self.title,
-            "lat": self.lat,
-            "lng": self.lng,
-            "description": self.description,
-            "url": self.url,
-            "polygon": self.polygon,
-            "conversations": [c.to_dict() for c in self.conversations]
-        }
+    def __eq__(self, other):
+        return (
+            isinstance(other, Conflicto) and
+            self.paises == other.paises and
+            self.nombre == other.nombre
+        )
+
+    def __hash__(self):
+        return hash((self.pais, self.titulo))

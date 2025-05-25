@@ -39,25 +39,25 @@ def editar_perfil(safe_oid):
         flask.flash("No se pudo conectar con la base de datos, inténtalo en otro momento.", "danger")
         return flask.redirect(flask.url_for("main.index"))
 
-  #  try:
-    user = srp.load(srp.oid_from_safe(safe_oid))
+    try:
+        user = srp.load(srp.oid_from_safe(safe_oid))
 
-    if not user or user.email != flask_login.current_user.email:
-        raise Exception()
+        if not user or user.email != flask_login.current_user.email:
+            raise Exception()
 
-    if flask.request.method == "POST":
-        user.name = flask.request.form.get("name", user.name)
-        user.username = flask.request.form.get("username", user.username)
-        user.bio = flask.request.form.get("bio", user.bio)
-        user.language = flask.request.form.get("language", user.language)
-        user.timezone = flask.request.form.get("timezone", user.timezone)
-        srp.save(user)
-        flask.flash("Perfil actualizado correctamente.", "success")
-        return flask.redirect(flask.url_for("profile.profile", safe_oid=safe_oid))
+        if flask.request.method == "POST":
+            user.name = flask.request.form.get("name", user.name)
+            user.username = flask.request.form.get("username", user.username)
+            user.bio = flask.request.form.get("bio", user.bio)
+            user.language = flask.request.form.get("language", user.language)
+            user.timezone = flask.request.form.get("timezone", user.timezone)
+            srp.save(user)
+            flask.flash("Perfil actualizado correctamente.", "success")
+            return flask.redirect(flask.url_for("profile.profile", safe_oid=safe_oid))
 
-    country_code = country_names.get(user.country, "aq")
-    return flask.render_template("editar-perfil.html", user=user, country_code=country_code, safe_oid=safe_oid)
+        country_code = country_names.get(user.country, "aq")
+        return flask.render_template("editar-perfil.html", user=user, country_code=country_code, safe_oid=safe_oid)
 
-# except Exception:
-    flask.flash("No se ha podido recuperar el perfil de usuario.", "danger")
-    return flask.redirect(flask.url_for("main.index"))
+    except Exception:
+        flask.flash("No se ha podido recuperar el perfil de usuario.", "danger")
+        return flask.redirect(flask.url_for("main.index"))
