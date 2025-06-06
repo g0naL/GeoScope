@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="bg-white rounded shadow p-4">
+        <h2>{{ conflicto.titulo }}</h2>
+        <p class="text-muted">Foro sobre el conflicto geopolítico</p>
+
+        <hr>
+        <button class="btn btn-outline-success mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#formularioConversacion" aria-expanded="false" aria-controls="formularioConversacion">
+            + Nueva conversación
+        </button>
+
+        <div class="collapse" id="formularioConversacion">
+            <form method="POST" class="mb-4 border p-3 rounded bg-light">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Título</label>
+                    <input type="text" id="title" name="title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="autor" class="form-label">Autor</label>
+                    <input type="text" id="autor" name="autor" class="form-control" placeholder="Anónimo">
+                </div>
+                <div class="mb-3">
+                    <label for="content" class="form-label">Contenido</label>
+                    <textarea id="content" name="content" class="form-control" rows="3" required></textarea>
+                </div>
+                <button class="btn btn-success" type="submit">Publicar</button>
+            </form>
+        </div>
+
+        <hr>
+        <h5>Conversaciones</h5>
+        {% if conversaciones %}
+            <div class="row g-3">
+                {% for conv, ult_com in conversaciones %}
+                    <div class="col-12">
+                        <a href="{{ url_for('conversaciones.ver_conversacion', conflicto_id=conflicto.id, conversation_oid=conv._oid) }}" class="text-decoration-none">
+                            <div class="p-3 rounded shadow-sm border bg-conv hover-shadow transition text-white">
+                                <h6 class="mb-2">{{ conv.title }}</h6>
+                                <p class="mb-1 small">
+                                    <strong>Autor:</strong> {{ conv.autor }}
+                                </p>
+                                {% if ult_com %}
+                                    <p class="mb-0 small">
+                                        <strong>Último comentario:</strong> {{ ult_com.autor }} – 
+                                        "{{ ult_com.contenido[:100] }}{% if ult_com.contenido|length > 100 %}...{% endif %}"
+                                    </p>
+                                {% else %}
+                                    <p class="mb-0 small fst-italic">Sin comentarios aún</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No hay conversaciones aún.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.bg-conv {
+    background-color: #374c63;
+}
+.hover-shadow:hover {
+    background-color: #2e3f54;
+}
+.transition {
+    transition: all 0.2s ease;
+}
+</style>
+{% endblock %}
