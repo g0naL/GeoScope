@@ -4,54 +4,163 @@
 <div class="container-fluid py-5 bg-light">
     <div class="container bg-white rounded shadow p-4">
         <h2 class="mb-4">Mapa de Conflictos Geopolíticos</h2>
+
+        <div class="mb-3">
+            <label for="conflictoSelect" class="form-label fw-semibold">Filtrar marcadores por conflicto:</label>
+            <select id="conflictoSelect" class="form-select">
+                <option value="todos" selected>Mostrar todos</option>
+                {% for c in conflictos %}
+                    <option value="{{ c.id }}">{{ c.titulo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button id="btnAñadir" class="btn btn-primary mb-3">Añadir Marcador</button>
+
+        <form id="formMarcador" class="border p-3 rounded mb-4 bg-light" style="display: none;">
+            <div class="mb-2">
+                <label for="conflictoInput" class="form-label">Conflicto:</label>
+                <select id="conflictoInput" class="form-select">
+                    {% for c in conflictos %}
+                        <option value="{{ c.id }}">{{ c.titulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>Coordenadas:</label>
+                <input type="text" id="latitudInput" class="form-control mb-1" placeholder="Latitud" readonly>
+                <input type="text" id="longitudInput" class="form-control" placeholder="Longitud" readonly>
+                <small class="text-muted">Haz clic en el mapa para seleccionar</small>
+            </div>
+            <div class="mb-2">
+                <label for="iconoInput" class="form-label">Icono:</label>
+                <select id="iconoInput" class="form-select">
+                    <option value="bomb">Bomba</option>
+                    <option value="ak-47">Fusil</option>
+                    <option value="coalition">Coalición</option>
+                    <option value="meeting-room">Reunión</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label for="textoInput" class="form-label">Descripción:</label>
+                <textarea id="textoInput" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar Marcador</button>
+        </form>
+
         <div id="map" class="rounded border shadow-sm" style="height: 600px;"></div>
     </div>
 </div>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
+<!-- Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
-
-<pre> {{ mapa.get_paises_afectados() }} </pre>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var map = L.map('map').setView([20, 0], 2);
+document.addEventListener("DOMContentLoaded", function () {
+    const map = L.map('map', {
+        maxBounds: [[-85, -180], [85, 180]],
+        minZoom: 3,
+        maxZoom: 15,
+        worldCopyJump: false
+    }).setView([20, 0], 2);
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
 
-        // Lista dinámica de países afectados desde Flask
-        const conflictos = {{ mapa.conflictos | tojson | safe }};
+    const conflictos = {{ conflictos | tojson | safe }};
+    const marcadoresPorConflicto = {{ marcadores | tojson | safe }};
+    const markerLayerGroup = L.layerGroup().addTo(map);
+
+    function crearIcono(nombre) {
+        return L.icon({
+            iconUrl: "{{ url_for('mapa.static', filename='icons') }}/" + nombre + ".png",
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+    }
 
     fetch("{{ url_for('mapa.static', filename='countries.geojson') }}")
     .then(res => res.json())
     .then(data => {
-        Object.values(conflictos).forEach(conflicto => {
+        conflictos.forEach(conflicto => {
             L.geoJSON(data, {
-                filter: feature => conflicto.paises.includes(feature.properties.name),
+                filter: f => conflicto.paises.includes(f.properties.name),
                 style: {
                     color: conflicto.color,
                     fillColor: conflicto.fillColor,
                     fillOpacity: 0.4,
                     weight: 2
                 },
-                onEachFeature: function (feature, layer) {
-                    layer.bindPopup(`
-                        <strong>Conflicto:</strong> ${conflicto.nombre}<br>
-                        <strong>País:</strong> ${feature.properties.name}
-                    `);
-                }
+                interactive: false  // ← esto permite seleccionar coordenadas aunque haya un país debajo
             }).addTo(map);
         });
-    })
+
+        function mostrarMarcadores(idConflicto) {
+            markerLayerGroup.clearLayers();
+            if (idConflicto === "todos") {
+                Object.values(marcadoresPorConflicto).flat().forEach(m => {
+                    L.marker([m.lat, m.lng], { icon: crearIcono(m.icono) })
+                     .addTo(markerLayerGroup)
+                     .bindPopup(m.texto);
+                });
+            } else {
+                (marcadoresPorConflicto[idConflicto] || []).forEach(m => {
+                    L.marker([m.lat, m.lng], { icon: crearIcono(m.icono) })
+                     .addTo(markerLayerGroup)
+                     .bindPopup(m.texto);
+                });
+            }
+        }
+
+        document.getElementById("conflictoSelect").addEventListener("change", e => {
+            mostrarMarcadores(e.target.value);
+        });
+
+        mostrarMarcadores("todos");
+
+        // Añadir marcador
+        document.getElementById("btnAñadir").addEventListener("click", () => {
+            document.getElementById("formMarcador").style.display = "block";
+        });
+
+        map.on("click", e => {
+            document.getElementById("latitudInput").value = e.latlng.lat.toFixed(5);
+            document.getElementById("longitudInput").value = e.latlng.lng.toFixed(5);
+        });
+
+        document.getElementById("formMarcador").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const nuevo = {
+                lat: parseFloat(document.getElementById("latitudInput").value),
+                lng: parseFloat(document.getElementById("longitudInput").value),
+                icono: document.getElementById("iconoInput").value,
+                texto: document.getElementById("textoInput").value,
+                conflicto_id: document.getElementById("conflictoInput").value
+            };
+
+            fetch("/mapa", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(nuevo)
+            })
+            .then(r => r.json())
+            .then(resp => {
+                if (resp.ok) {
+                    marcadoresPorConflicto[nuevo.conflicto_id] = marcadoresPorConflicto[nuevo.conflicto_id] || [];
+                    marcadoresPorConflicto[nuevo.conflicto_id].push(nuevo);
+                    mostrarMarcadores(nuevo.conflicto_id);
+                    document.getElementById("formMarcador").reset();
+                    document.getElementById("formMarcador").style.display = "none";
+                    alert("Marcador guardado.");
+                } else {
+                    alert("Error: " + resp.msg);
+                }
+            });
+        });
+    });
 });
 </script>
 {% endblock %}

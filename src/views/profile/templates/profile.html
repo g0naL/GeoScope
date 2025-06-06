@@ -11,7 +11,7 @@
                  width="48" height="32"
                  class="me-3 border rounded shadow-sm"
                  style="object-fit: cover;">
-            <h2 class="mb-0">{{ user.name }}</h2>
+            <h2 class="mb-0">{{ user.name[:25] ~ ("…" if user.name|length > 25 else "") }}</h2>
         </div>
 
         <hr>

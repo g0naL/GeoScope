@@ -3,7 +3,7 @@ import flask_login
 import sirope
 import redis
 from country_list import countries_for_language
-
+import pytz
 
 profile_bp = flask.Blueprint("profile", __name__, url_prefix='', template_folder="templates", static_folder="static", static_url_path="/profile/static")
 
@@ -20,8 +20,8 @@ def profile(safe_oid):
 
     try:
         user = srp.load(srp.oid_from_safe(safe_oid))
-        if not user or user.email != flask_login.current_user.email:
-            raise Exception()
+ #       if not user or user.email != flask_login.current_user.email:
+ #           raise Exception()
         country_code = country_names.get(user.country, "aq")
         return flask.render_template("profile.html", user=user, country_code=country_code)
     except Exception:
@@ -56,7 +56,7 @@ def editar_perfil(safe_oid):
             return flask.redirect(flask.url_for("profile.profile", safe_oid=safe_oid))
 
         country_code = country_names.get(user.country, "aq")
-        return flask.render_template("editar-perfil.html", user=user, country_code=country_code, safe_oid=safe_oid)
+        return flask.render_template("editar-perfil.html", user=user, country_code=country_code, safe_oid=safe_oid, timezones=pytz.all_timezones)
 
     except Exception:
         flask.flash("No se ha podido recuperar el perfil de usuario.", "danger")

@@ -62,9 +62,9 @@ class UserEntity(flask_login.UserMixin):
          return srp.find_first(UserEntity, lambda u: u.email == email)
 
     @staticmethod
-    def create(srp, name, email, password, country):
+    def create(srp, name, email, password, country, username, language, timezone):
         if UserEntity.find_by_mail(srp, email):
             return None  # Ya existe
-        user = UserEntity(name, email, password, country)
+        user = UserEntity(name, email, password, country, username, language, timezone)
         srp.save(user)
         return user

@@ -7,6 +7,7 @@ from views.main.main_view import main_bp
 from views.auth.auth_view import auth_bp
 from views.mapa.map_view import mapa_bp
 from views.profile.profile_view import profile_bp
+from views.conversaciones.conversaciones_view import conversaciones_bp
 from model.UserEntity import UserEntity
 
 
@@ -38,6 +39,7 @@ def create_app():
     fapp.register_blueprint(auth_bp)
     fapp.register_blueprint(mapa_bp)
     fapp.register_blueprint(profile_bp)
+    fapp.register_blueprint(conversaciones_bp)
 
     return fapp, lmanager, srp
 

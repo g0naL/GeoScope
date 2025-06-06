@@ -1,21 +1,35 @@
 class Conflicto:
-    def __init__(self, titulo, paises, color, fillColor, descripcion="",):
+    def __init__(self, id, titulo, paises, color, fillColor, descripcion=""):
+        self.id = id
         self.titulo = titulo
         self.descripcion = descripcion
         self.paises = paises
         self.color = color
         self.fillColor = fillColor
+        self.marcadores = []  # Lista de diccionarios
+        self.conversacion_oids = []  # Lista de OIDs de ConversationEntity
 
-    def añadir_pais(self, pais):
-        if pais not in self.paises:
-            self.paises.append(pais)
+    def añadir_marcador(self, marcador: dict):
+        self.marcadores.append(marcador)
 
-    def __eq__(self, other):
-        return (
-            isinstance(other, Conflicto) and
-            self.paises == other.paises and
-            self.nombre == other.nombre
-        )
+    def get_marcadores(self):
+        return self.marcadores
 
-    def __hash__(self):
-        return hash((self.pais, self.titulo))
+    def añadir_conversacion(self, conversacion, srp):
+        oid = srp.save(conversacion)
+        if oid not in self.conversacion_oids:
+            self.conversacion_oids.append(oid)
+
+    def get_conversaciones(self, srp):
+        return [srp.load(oid) for oid in self.conversacion_oids]
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "titulo": self.titulo,
+            "descripcion": self.descripcion,
+            "paises": self.paises,
+            "color": self.color,
+            "fillColor": self.fillColor,
+            "marcadores": self.marcadores
+        }

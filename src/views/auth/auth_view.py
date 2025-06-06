@@ -5,6 +5,7 @@ import sirope
 from model.UserEntity import UserEntity
 from werkzeug.security import check_password_hash
 from country_list import countries_for_language
+import pytz
 
 # Creamos el blueprint "auth", como módulo independiente
 auth_bp = flask.Blueprint("auth", __name__, template_folder="templates", static_folder="static", static_url_path="/auth/static")
@@ -23,18 +24,22 @@ def registro():
 
     if flask.request.method == "POST":
         name = flask.request.form["name"]
+        username = flask.request.form["username"]
         email = flask.request.form["email"]
         pw = flask.request.form["password"]
         country = flask.request.form.get("country") or "unknown"
+        timezone = flask.request.form["timezone"]
+        language = flask.request.form["language"]
+
 
         if UserEntity.find_by_mail(srp, email):
             flask.flash("El correo electrónico ya está asociada a otra cuenta.", "danger")
         else:
-            UserEntity.create(srp, name, email, pw, country)
+            UserEntity.create(srp, name, email, pw, country, username, language, timezone)
             flask.flash("Registro exitoso, ya puedes iniciar sesión.", "success")
             return flask.redirect(flask.url_for("auth.login"))
 
-    return flask.render_template("registro.html", countries=countries)
+    return flask.render_template("registro.html", countries=countries, timezones=pytz.all_timezones)
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])

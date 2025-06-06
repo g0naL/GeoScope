@@ -48,7 +48,7 @@
             <div class="mx-auto position-absolute start-50 translate-middle-x">
                 <ul class="navbar-nav flex-row">
                     <li class="nav-item px-3"><a class="nav-link" href="/">Inicio</a></li>
-                    <li class="nav-item px-3"><a class="nav-link" href="#">Conflictos</a></li>
+                    <li class="nav-item px-3"><a class="nav-link" href="/conversaciones">Conversaciones</a></li>
                     <li class="nav-item px-3"><a class="nav-link" href="/mapa">Mapa</a></li>
                 </ul>
             </div>
@@ -58,7 +58,7 @@
                 {% if current_user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-secondary fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ current_user.name }}
+                            {{ current_user.name[:12] ~ ("…" if current_user.name|length > 12 else "") }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="/profile/{{ safe_oid }}">Perfil</a></li>
