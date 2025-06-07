@@ -1,5 +1,5 @@
 class ConversationEntity:
-    def __init__(self, title, content, autor="Anónimo"):
+    def __init__(self, title, content, autor):
         self.title = title
         self.content = content
         self.autor = autor
@@ -12,6 +12,21 @@ class ConversationEntity:
 
     def get_comentarios(self, srp):
         return [srp.load(oid) for oid in self.comentario_oids]
+    
+    def eliminar_comentario(self, srp, comentario_oid):
+        """
+        Elimina un comentario de la conversación y lo borra del almacenamiento.
+        """
+        if comentario_oid in self.comentario_oids:
+            self.comentario_oids.remove(comentario_oid)
+            srp.delete(comentario_oid)
+        
+    def eliminar_comentarios_de(self, username, srp):
+        for i, c in reversed(list(enumerate(self.get_comentarios(srp)))):
+            if c.autor == username:
+                srp.delete_oid(self.comentario_oids[i])
+                del self.comentario_oids[i]
+
 
     def to_dict(self):
         return {

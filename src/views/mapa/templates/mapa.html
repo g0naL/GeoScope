@@ -2,6 +2,18 @@
 
 {% block content %}
 <div class="container-fluid py-5 bg-light">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show text-center" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <div class="container bg-white rounded shadow p-4">
         <h2 class="mb-4">Mapa de Conflictos Geopolíticos</h2>
 
@@ -94,25 +106,56 @@ document.addEventListener("DOMContentLoaded", function () {
                     fillOpacity: 0.4,
                     weight: 2
                 },
-                interactive: false  // ← esto permite seleccionar coordenadas aunque haya un país debajo
+                interactive: false
             }).addTo(map);
         });
 
         function mostrarMarcadores(idConflicto) {
             markerLayerGroup.clearLayers();
-            if (idConflicto === "todos") {
-                Object.values(marcadoresPorConflicto).flat().forEach(m => {
-                    L.marker([m.lat, m.lng], { icon: crearIcono(m.icono) })
-                     .addTo(markerLayerGroup)
-                     .bindPopup(m.texto);
+            const marcadores = idConflicto === "todos"
+                ? Object.values(marcadoresPorConflicto).flat()
+                : (marcadoresPorConflicto[idConflicto] || []);
+
+            marcadores.forEach(m => {
+                const marker = L.marker([m.lat, m.lng], { icon: crearIcono(m.icono) });
+                marker.bindPopup(`
+                    <div style="max-width:250px;">
+                        <p>${m.texto}</p>
+                        <button class="btn btn-sm btn-danger mt-2 btn-borrar-marcador"
+                                data-lat="${m.lat}" data-lng="${m.lng}" data-conflicto="${m.conflicto_id}">
+                            Eliminar
+                        </button>
+                    </div>
+                `);
+                marker.addTo(markerLayerGroup);
+                marker.on("popupopen", () => {
+                    setTimeout(() => {
+                        document.querySelectorAll(".btn-borrar-marcador").forEach(btn => {
+                            btn.addEventListener("click", () => {
+                                const lat = parseFloat(btn.dataset.lat);
+                                const lng = parseFloat(btn.dataset.lng);
+                                const conflicto_id = btn.dataset.conflicto;
+
+                                fetch("/mapa", {
+                                    method: "DELETE",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ lat, lng, conflicto_id })
+                                })
+                                .then(r => r.json())
+                                .then(resp => {
+                                    if (resp.redirected) {
+                                        window.location.href = resp.url;
+                                    } else if (resp.ok) {
+                                        marcadoresPorConflicto[conflicto_id] = marcadoresPorConflicto[conflicto_id]
+                                            .filter(m => m.lat !== lat || m.lng !== lng);
+                                        mostrarMarcadores(idConflicto);
+                                    }
+                                });
+                            });
+                        });
+                    }, 100); // Espera a que el botón esté disponible en el DOM
                 });
-            } else {
-                (marcadoresPorConflicto[idConflicto] || []).forEach(m => {
-                    L.marker([m.lat, m.lng], { icon: crearIcono(m.icono) })
-                     .addTo(markerLayerGroup)
-                     .bindPopup(m.texto);
-                });
-            }
+            });
         }
 
         document.getElementById("conflictoSelect").addEventListener("change", e => {
@@ -121,7 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         mostrarMarcadores("todos");
 
-        // Añadir marcador
         document.getElementById("btnAñadir").addEventListener("click", () => {
             document.getElementById("formMarcador").style.display = "block";
         });
@@ -148,15 +190,14 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(r => r.json())
             .then(resp => {
-                if (resp.ok) {
+                if (resp.redirected) {
+                    window.location.href = resp.url;
+                } else if (resp.ok) {
                     marcadoresPorConflicto[nuevo.conflicto_id] = marcadoresPorConflicto[nuevo.conflicto_id] || [];
                     marcadoresPorConflicto[nuevo.conflicto_id].push(nuevo);
                     mostrarMarcadores(nuevo.conflicto_id);
                     document.getElementById("formMarcador").reset();
                     document.getElementById("formMarcador").style.display = "none";
-                    alert("Marcador guardado.");
-                } else {
-                    alert("Error: " + resp.msg);
                 }
             });
         });

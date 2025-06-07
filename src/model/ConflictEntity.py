@@ -22,6 +22,9 @@ class Conflicto:
 
     def get_conversaciones(self, srp):
         return [srp.load(oid) for oid in self.conversacion_oids]
+    
+    def eliminar_marcador(self, lat, lng):
+        self.marcadores = [m for m in self.marcadores if m["lat"] != lat or m["lng"] != lng]
 
     def to_dict(self):
         return {

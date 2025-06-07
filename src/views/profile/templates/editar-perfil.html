@@ -56,6 +56,13 @@
             </div>
         </form>
 
+        <hr class="my-4">
+        <form method="POST" action="{{ url_for('profile.editar_perfil', safe_oid=safe_oid) }}" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');">
+            <input type="hidden" name="delete_account" value="1">
+            <button type="submit" class="btn btn-outline-danger w-100">Eliminar cuenta y todos mis comentarios</button>
+        </form>
+
+
     </div>
 </div>
 {% endblock %}

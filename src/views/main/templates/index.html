@@ -16,6 +16,7 @@
     {% endif %}
 {% endwith %}
 
+<!-- Hero -->
 <div class="py-5 text-center text-white" style="background: linear-gradient(135deg, #343a40, #212529);">
     <h1 class="display-4"> GeoScope</h1>
     <p class="lead">Explora conflictos geopolíticos activos y participa en la conversación global.</p>
@@ -23,35 +24,53 @@
 
 <div class="container my-5">
     <div class="position-relative" style="max-width: 900px; margin: 0 auto;">
-
         <div id="mapCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner rounded shadow">
+            <div class="carousel-inner rounded shadow-lg border">
 
                 <div class="carousel-item active">
-                    <a href="/mapa">
-                        <img src="{{ url_for('main.static', filename='images/mapa.png') }}" class="d-block w-100" alt="Mapa 1">
+                    <a href="/conversaciones/ukr_ru">
+                        <img src="{{ url_for('main.static', filename='images/suceso3.jpg') }}"
+                             class="d-block w-100"
+                             style="height: 700px; object-fit: cover;"
+                             alt="Mapa 1">
                         <div class="carousel-caption d-none d-md-block">
                             <h5 class="bg-dark bg-opacity-75 p-2 rounded">
-                                Haz clic en el mapa para explorar los conflictos activos
+                                Bombardeo nocturno sobre objetivos ucranianos
                             </h5>
                         </div>
                     </a>
                 </div>
 
                 <div class="carousel-item">
-                    <a href="/mapa">
-                        <img src="{{ url_for('main.static', filename='images/mapa1.jpeg') }}" class="d-block w-100" alt="Mapa 2">
+                    <a href="/conversaciones/ukr_ru">
+                        <img src="{{ url_for('main.static', filename='images/suceso4.jpg') }}"
+                             class="d-block w-100"
+                             style="height: 700px; object-fit: cover;"
+                             alt="Mapa 2">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 class="bg-dark bg-opacity-75 p-2 rounded">
+                                Explosiones en el aeropuerto de Bryansk
+                            </h5>
+                        </div>
                     </a>
                 </div>
 
                 <div class="carousel-item">
-                    <a href="/mapa">
-                        <img src="{{ url_for('main.static', filename='images/mapa2.jpg') }}" class="d-block w-100" alt="Mapa 3">
+                    <a href="/conversaciones/ps">
+                        <img src="{{ url_for('main.static', filename='images/suceso1.jpg') }}"
+                             class="d-block w-100"
+                             style="height: 700px; object-fit: cover;"
+                             alt="Mapa 3">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 class="bg-dark bg-opacity-75 p-2 rounded">
+                                Soldados israelís avanzan en las cercanías de Rafah
+                            </h5>
+                        </div>
                     </a>
                 </div>
+
             </div>
 
-            <p>Safe OID: {{ safe_oid }}</p>
             <button class="carousel-control-prev" type="button" data-bs-target="#mapCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Anterior</span>
@@ -61,10 +80,60 @@
                 <span class="visually-hidden">Siguiente</span>
             </button>
         </div>
-        
+
+        <div class="text-center mt-4">
+            <a href="/mapa" class="btn btn-outline-dark btn-lg px-4 shadow-sm">
+                Acceder al mapa interactivo
+            </a>
+        </div>
     </div>
 </div>
 
 
+<!-- ¿Qué es GeoScope? -->
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">¿Qué es GeoScope?</h2>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <h5 class="fw-bold">Visualización global</h5>
+                    <p class="text-muted">Accede a un mapa interactivo con los conflictos geopolíticos más relevantes del momento. Colores, ubicaciones y actores clave, todo en un solo lugar.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <h5 class="fw-bold">Comunidad activa</h5>
+                    <p class="text-muted">Únete a conversaciones temáticas sobre cada conflicto. Comparte análisis, intercambia opiniones y mantente informado desde múltiples perspectivas.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <h5 class="fw-bold">Acceso gratuito</h5>
+                    <p class="text-muted">GeoScope es una plataforma abierta y gratuita. Solo necesitas una cuenta para participar activamente en la comunidad y aportar tu visión.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Opiniones destacadas -->
+<div class="container my-5">
+    <h2 class="text-center mb-4">Lo que dicen nuestros usuarios</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-5 mb-4">
+            <div class="border-start border-4 border-primary ps-3 bg-white rounded shadow-sm">
+                <p class="mb-1 fst-italic">“Nunca había encontrado una herramienta tan clara para seguir los conflictos mundiales. GeoScope me permite entender y compartir con otros.”</p>
+                <small class="text-muted">— Natalia R., analista internacional</small>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="border-start border-4 border-success ps-3 bg-white rounded shadow-sm">
+                <p class="mb-1 fst-italic">“Me encanta lo visual e intuitivo que es. Además, el foro ayuda a estar al día desde diferentes puntos de vista.”</p>
+                <small class="text-muted">— Sergio M., estudiante de Relaciones Internacionales</small>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
