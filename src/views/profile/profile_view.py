@@ -5,10 +5,21 @@ import redis
 from country_list import countries_for_language
 import pytz
 
-profile_bp = flask.Blueprint("profile", __name__, url_prefix='', template_folder="templates", static_folder="static", static_url_path="/profile/static")
+profile_bp = flask.Blueprint(
+    "profile", __name__,
+    url_prefix='',
+    template_folder="templates",
+    static_folder="static",
+    static_url_path="/profile/static"
+)
 
 @profile_bp.route("/profile/<safe_oid>")
 def profile(safe_oid):
+    """Renderiza el perfil del usuario, incluyendo sus comentarios.
+
+    :param safe_oid: OID seguro del usuario.
+    :return: Plantilla HTML con la información del perfil.
+    """
     from model.MapEntity import Mapa
     from model.ConversationEntity import ConversationEntity
 
@@ -23,11 +34,9 @@ def profile(safe_oid):
     try:
         user = srp.load(srp.oid_from_safe(safe_oid))
         country_code = country_names.get(user.country, "aq")
-
-        # Buscar comentarios del usuario
-        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
         comentarios_usuario = []
 
+        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
         if mapa:
             for conflicto in mapa.get_conflictos(srp):
                 for conversacion in conflicto.get_conversaciones(srp):
@@ -51,10 +60,14 @@ def profile(safe_oid):
         flask.flash("No se ha podido recuperar el perfil del usuario, inténtelo en otro momento", "danger")
         return flask.redirect(flask.url_for("main.index"))
 
-
 @profile_bp.route("/editar-perfil/<safe_oid>", methods=["GET", "POST"])
 @flask_login.login_required
 def editar_perfil(safe_oid):
+    """Permite editar el perfil del usuario o eliminar su cuenta.
+
+    :param safe_oid: OID seguro del usuario.
+    :return: Plantilla de edición o redirección según la acción realizada.
+    """
     from model.MapEntity import Mapa
     from model.UserEntity import UserEntity
 
@@ -74,10 +87,9 @@ def editar_perfil(safe_oid):
 
         if flask.request.method == "POST":
             if flask.request.form.get("delete_account"):
-                # Cerrar sesión primero
+                """Elimina el usuario y todos sus comentarios."""
                 flask_login.logout_user()
 
-                # Eliminar comentarios
                 mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
                 if mapa:
                     for conflicto in mapa.get_conflictos(srp):
@@ -89,27 +101,29 @@ def editar_perfil(safe_oid):
                                     conversacion.eliminar_comentario(srp, comentario_oid)
                             srp.save(conversacion)
 
-                # Eliminar el usuario
                 srp.delete(user.oid)
-
                 flask.flash("Tu cuenta ha sido eliminada permanentemente.", "info")
                 return flask.redirect(flask.url_for("main.index"))
 
-
-            # Actualizar perfil
             user.name = flask.request.form.get("name", user.name)
             user.username = flask.request.form.get("username", user.username)
             user.bio = flask.request.form.get("bio", user.bio)
             user.language = flask.request.form.get("language", user.language)
             user.timezone = flask.request.form.get("timezone", user.timezone)
             srp.save(user)
+
             flask.flash("Perfil actualizado correctamente.", "success")
             return flask.redirect(flask.url_for("profile.profile", safe_oid=safe_oid))
 
         country_code = country_names.get(user.country, "aq")
-        return flask.render_template("editar-perfil.html", user=user, country_code=country_code, safe_oid=safe_oid, timezones=pytz.all_timezones)
-    
+        return flask.render_template(
+            "editar-perfil.html",
+            user=user,
+            country_code=country_code,
+            safe_oid=safe_oid,
+            timezones=pytz.all_timezones
+        )
+
     except Exception:
         flask.flash("No se ha podido recuperar el perfil de usuario.", "danger")
         return flask.redirect(flask.url_for("main.index"))
-

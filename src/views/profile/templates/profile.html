@@ -4,7 +4,6 @@
 <div class="container-fluid py-5 bg-light">
     <div class="container bg-white rounded shadow p-4" style="max-width: 800px;">
         
-        <!-- Encabezado: Nombre + bandera -->
         <div class="d-flex align-items-center mb-4">
             <img src="https://flagcdn.com/w80/{{ country_code|lower }}.png"
                  alt="{{ user.country }}"
@@ -16,7 +15,6 @@
 
         <hr>
 
-        <!-- Sección de datos -->
         <div class="mb-3"><label class="form-label fw-semibold">Email</label>
             <div>{% if current_user.is_authenticated and current_user.email == user.email %}
                 <span>{{ user.email }}</span>
@@ -47,7 +45,6 @@
         <div class="mb-3"><label class="form-label fw-semibold">Última conexión</label>
             <div>{{ user.get_last_login() }}</div></div>
 
-        <!-- Comentarios del usuario -->
         <hr class="my-4">
         <div class="mb-3">
             <h5 class="fw-bold mb-3">Comentarios realizados</h5>
@@ -72,7 +69,6 @@
             {% endif %}
         </div>
 
-        <!-- Botón de editar (solo si es el propio usuario) -->
         {% if current_user.is_authenticated and current_user.email == user.email %}
         <div class="mt-4">
             <a href="/editar-perfil/{{ safe_oid }}" class="btn btn-outline-primary">Editar perfil</a>

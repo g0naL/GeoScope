@@ -9,20 +9,24 @@ from flask_login import current_user
 
 from model.UserEntity import UserEntity
 
+# Blueprint para las rutas relacionadas con el foro de conversaciones
 conversaciones_bp = flask.Blueprint("conversaciones", __name__, template_folder="templates", static_folder="static", static_url_path="/conversaciones/static")
+
 
 @conversaciones_bp.route("/conversaciones", methods=["GET"])
 def foro_index():
+    """Muestra la página principal del foro con todos los conflictos disponibles.
+
+    :return: Renderiza la plantilla 'conversaciones.html' con la lista de conflictos.
+    """
     try:
         srp = sirope.Sirope()
-
         mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
         if not mapa:
             flask.flash("No se encontró el mapa", "danger")
             return flask.redirect(flask.url_for("main.index"))
 
         conflictos = mapa.get_conflictos(srp)
-
         return flask.render_template("conversaciones.html", conflictos=conflictos)
 
     except redis.exceptions.ConnectionError:
@@ -35,9 +39,13 @@ def foro_index():
 
 @conversaciones_bp.route("/conversaciones/<conflicto_id>", methods=["GET", "POST"])
 def foro_conflicto(conflicto_id):
+    """Muestra y permite crear conversaciones dentro de un conflicto específico.
+
+    :param conflicto_id: ID del conflicto al que se accede.
+    :return: Renderiza la plantilla 'foro_conflicto.html' con las conversaciones.
+    """
     try:
         srp = sirope.Sirope()
-
         mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
         if not mapa:
             flask.flash("No se encontró el mapa", "danger")
@@ -82,6 +90,12 @@ def foro_conflicto(conflicto_id):
 
 @conversaciones_bp.route("/conversaciones/<conflicto_id>/<conversation_soid>", methods=["GET", "POST"])
 def ver_conversacion(conflicto_id, conversation_soid):
+    """Muestra una conversación concreta y permite añadir o eliminar comentarios.
+
+    :param conflicto_id: ID del conflicto relacionado.
+    :param conversation_soid: OID seguro de la conversación.
+    :return: Renderiza 'ver_conversacion.html' con comentarios paginados.
+    """
     try:
         srp = sirope.Sirope()
         mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
@@ -95,7 +109,6 @@ def ver_conversacion(conflicto_id, conversation_soid):
             flask.flash("Conversación no encontrada", "warning")
             return flask.redirect(flask.url_for("conversaciones.foro_conflicto", conflicto_id=conflicto.id))
 
-        # Manejo de nuevo comentario o eliminación
         if flask.request.method == "POST":
             if 'contenido' in flask.request.form:
                 contenido = flask.request.form.get("contenido")
@@ -105,6 +118,7 @@ def ver_conversacion(conflicto_id, conversation_soid):
                     conversacion.añadir_comentario(nuevo, srp)
                     srp.save(conversacion)
                     return flask.redirect(flask.url_for("conversaciones.ver_conversacion", conflicto_id=conflicto.id, conversation_soid=conversation_soid))
+
             elif 'borrar_comentario' in flask.request.form:
                 comentario_id = flask.request.form.get("borrar_comentario")
                 comentarios = conversacion.get_comentarios(srp)
@@ -116,7 +130,6 @@ def ver_conversacion(conflicto_id, conversation_soid):
                         break
                 return flask.redirect(flask.url_for("conversaciones.ver_conversacion", conflicto_id=conflicto.id, conversation_soid=conversation_soid))
 
-        # Paginación
         comentarios = conversacion.get_comentarios(srp)
         comentarios.sort(key=lambda c: c.fecha)
 
@@ -131,18 +144,17 @@ def ver_conversacion(conflicto_id, conversation_soid):
         for c in comentarios_paginados:
             if c.autor not in autores_oids:
                 user = srp.find_first(UserEntity, lambda u: u.username == c.autor)
-                if user:
-                    autores_oids[c.autor] = srp.safe_from_oid(user.__oid__)
-                else:
-                    autores_oids[c.autor] = None
+                autores_oids[c.autor] = srp.safe_from_oid(user.__oid__) if user else None
 
-        return flask.render_template("ver_conversacion.html",
-                                    conflicto=conflicto,
-                                    conversacion=conversacion,
-                                    comentarios=comentarios_paginados,
-                                    page=page,
-                                    total_pages=(total + per_page - 1) // per_page,
-                                    autores_oids=autores_oids)
+        return flask.render_template(
+            "ver_conversacion.html",
+            conflicto=conflicto,
+            conversacion=conversacion,
+            comentarios=comentarios_paginados,
+            page=page,
+            total_pages=(total + per_page - 1) // per_page,
+            autores_oids=autores_oids
+        )
 
     except redis.exceptions.ConnectionError:
         flask.flash("No se pudo conectar a la base de datos", "danger")

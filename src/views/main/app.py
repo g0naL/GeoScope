@@ -14,10 +14,15 @@ from model.UserEntity import UserEntity
 from model.MapEntity import Mapa
 from model.ConflictEntity import Conflicto
 
-def init_mapa(srp):
 
+def init_mapa(srp):
+    """Inicializa el mapa mundial con conflictos predeterminados si no existe.
+
+    :param srp: Objeto de persistencia Sirope.
+    """
     if srp.find_first(Mapa, lambda m: m.id == "world_map") is None:
         mapa = Mapa("world_map")
+
         mapa.añadir_conflicto(Conflicto(
             "ukr_ru", "Guerra en Ucrania", ["Ukraine", "Russia"],
             "#0057b7", "#ffd700",
@@ -59,9 +64,15 @@ def init_mapa(srp):
             "#9bb41f", "#c0aee8",
             "Tensiones fronterizas entre fuerzas militares y grupos armados en zonas limítrofes de ambos países."
         ), srp)
+
         srp.save(mapa)
 
+
 def create_app():
+    """Crea y configura la aplicación Flask, inicializando rutas, login y mapa.
+
+    :return: Tupla con la app, el login manager y el objeto Sirope.
+    """
     lmanager = flask_login.LoginManager()
     fapp = flask.Flask(
         __name__,
@@ -75,14 +86,20 @@ def create_app():
 
     @lmanager.user_loader
     def load_user(user_id):
+        """Carga un usuario desde su ID para flask-login.
+
+        :param user_id: ID del usuario.
+        :return: Objeto UserEntity si existe, si no None.
+        """
         return UserEntity.find(srp, user_id)
 
     @lmanager.unauthorized_handler
     def unauthorized_handler():
+        """Manejador para accesos no autorizados."""
         flask.flash("Unauthorized")
         return flask.redirect("/")
 
-    # Blueprints
+    # Registrar blueprints
     fapp.register_blueprint(main_bp)
     fapp.register_blueprint(auth_bp)
     fapp.register_blueprint(mapa_bp)
@@ -94,10 +111,16 @@ def create_app():
 
     return fapp, lmanager, srp
 
+
 app, lm, srp = create_app()
+
 
 @app.context_processor
 def inject_user_url():
+    """Inyecta el safe_oid del usuario actual en el contexto de las plantillas.
+
+    :return: Diccionario con la clave 'safe_oid' si el usuario está autenticado.
+    """
     if flask_login.current_user.is_authenticated:
         try:
             safe_oid = flask_login.current_user.get_safe_oid(srp)
@@ -106,6 +129,7 @@ def inject_user_url():
             print("Error al generar safe_oid:", e)
             return {}
     return {}
+
 
 if __name__ == "__main__":
     app.run(debug=True)
