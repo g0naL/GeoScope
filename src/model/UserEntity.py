@@ -140,7 +140,7 @@ class UserEntity(flask_login.UserMixin):
         :return: Usuario creado o None si ya existía.
         """
         if UserEntity.find_by_mail(srp, email):
-            return None  # Ya existe
+            return None
         user = UserEntity(name, email, password, country, username, language, timezone)
         srp.save(user)
         return user

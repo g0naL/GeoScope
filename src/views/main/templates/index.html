@@ -4,7 +4,6 @@
 
 {% block content %}
 
-<!-- Flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
@@ -16,7 +15,6 @@
     {% endif %}
 {% endwith %}
 
-<!-- Hero -->
 <div class="py-5 text-center text-white" style="background: linear-gradient(135deg, #343a40, #212529);">
     <h1 class="display-4"> GeoScope</h1>
     <p class="lead">Explora conflictos geopolíticos activos y participa en la conversación global.</p>
@@ -89,8 +87,6 @@
     </div>
 </div>
 
-
-<!-- ¿Qué es GeoScope? -->
 <div class="bg-light py-5">
     <div class="container">
         <h2 class="text-center mb-5">¿Qué es GeoScope?</h2>
@@ -117,7 +113,6 @@
     </div>
 </div>
 
-<!-- Opiniones destacadas -->
 <div class="container my-5">
     <h2 class="text-center mb-4">Lo que dicen nuestros usuarios</h2>
     <div class="row justify-content-center">

@@ -5,7 +5,7 @@
     <title>{% block title %}GeoScope{% endblock %}</title>
     <link rel="icon" href="{{ url_for('main.static', filename='images/favicon.ico') }}" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap desde CDN -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -23,13 +23,12 @@
             flex-shrink: 0;
         }
         .carousel-control-prev-icon, .carousel-control-next-icon {
-            filter: invert(1); /* invierte el color blanco a negro */
+            filter: invert(1);
         }
     </style>
 </head>
 <body class="bg-light text-dark">
 
-    <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
@@ -43,8 +42,6 @@
                 {% endif %}
             </ul>
             
-
-            <!-- Menú centrado -->
             <div class="mx-auto position-absolute start-50 translate-middle-x">
                 <ul class="navbar-nav flex-row">
                     <li class="nav-item px-3"><a class="nav-link" href="/">Inicio</a></li>
@@ -53,7 +50,6 @@
                 </ul>
             </div>
 
-            <!-- Menú derecha -->
             <ul class="navbar-nav ms-auto">
                 {% if current_user.is_authenticated %}
                     <li class="nav-item dropdown">
@@ -75,22 +71,17 @@
         </div>
     </nav>
 
-    <!-- Contenido principal -->
     <main class="container py-4">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="text-center text-muted py-3">
         © 2025 GeoScope | André González Alonso
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-<!-- CSS -->
 
 <style>
     .form-control {

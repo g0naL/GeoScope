@@ -17,8 +17,8 @@ class Conflicto:
         self.paises = paises
         self.color = color
         self.fillColor = fillColor
-        self.marcadores = []  # Lista de diccionarios
-        self.conversacion_oids = []  # Lista de OIDs de ConversationEntity
+        self.marcadores = []
+        self.conversacion_oids = []
 
     def añadir_marcador(self, marcador: dict):
         """Añade un marcador geográfico al conflicto.
