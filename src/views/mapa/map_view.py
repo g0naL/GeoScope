@@ -2,10 +2,8 @@ import flask
 import redis
 import sirope
 
-from model.MapEntity import Mapa
-from model.ConflictEntity import Conflicto
+from model.MapEntity import MapEntity
 
-# Se define el blueprint para las rutas relacionadas con el mapa
 mapa_bp = flask.Blueprint("mapa", __name__, template_folder="templates", static_folder="static", static_url_path="/mapa/static")
 
 @mapa_bp.route("/mapa", methods=["GET", "POST", "DELETE"])
@@ -16,7 +14,7 @@ def mostrar_mapa():
     """
     try:
         srp = sirope.Sirope()
-        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
+        mapa = srp.find_first(MapEntity, lambda m: m.id == "world_map")
 
         if mapa is None:
             if flask.request.method == "GET":
@@ -72,7 +70,6 @@ def mostrar_mapa():
 
             return flask.jsonify(ok=False, msg="Conflicto no encontrado"), 404
 
-        # GET: renderizar la página del mapa
         conflictos = mapa.get_conflictos(srp)
         conflictos_dict = [c.to_dict() for c in conflictos]
         marcadores = {c.id: c.get_marcadores() for c in conflictos}

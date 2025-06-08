@@ -1,4 +1,5 @@
 Título del proyecto: GeoScope – Visualizador de Conflictos Geopolíticos
-URL del proyecto: http://localhost:5000 (uso local)
+URL de Flask: http://localhost:5000 (uso local)
+URL del proyecto: https://github.com/g0naL/GeoScope/tree/main
 Apellidos y nombre: González Alonso, André
 DNI: 51273050R

@@ -1,4 +1,4 @@
-class Mapa:
+class MapEntity:
     """Representa un mapa que contiene una colección de conflictos geopolíticos."""
 
     def __init__(self, id):
@@ -6,8 +6,8 @@ class Mapa:
 
         :param id: Identificador manual del mapa.
         """
-        self.id = id  # Asignado manualmente
-        self.conflicto_oids = []  # Lista de OIDs de objetos Conflicto
+        self.id = id
+        self.conflicto_oids = []
 
     def añadir_conflicto(self, conflicto, srp):
         """Añade un conflicto al mapa, si no ha sido añadido previamente.

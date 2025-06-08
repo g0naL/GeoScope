@@ -11,7 +11,7 @@ from views.profile.profile_view import profile_bp
 from views.conversaciones.conversaciones_view import conversaciones_bp
 
 from model.UserEntity import UserEntity
-from model.MapEntity import Mapa
+from model.MapEntity import MapEntity
 from model.ConflictEntity import Conflicto
 
 
@@ -20,8 +20,8 @@ def init_mapa(srp):
 
     :param srp: Objeto de persistencia Sirope.
     """
-    if srp.find_first(Mapa, lambda m: m.id == "world_map") is None:
-        mapa = Mapa("world_map")
+    if srp.find_first(MapEntity, lambda m: m.id == "world_map") is None:
+        mapa = MapEntity("world_map")
 
         mapa.añadir_conflicto(Conflicto(
             "ukr_ru", "Guerra en Ucrania", ["Ukraine", "Russia"],
@@ -99,14 +99,12 @@ def create_app():
         flask.flash("Unauthorized")
         return flask.redirect("/")
 
-    # Registrar blueprints
     fapp.register_blueprint(main_bp)
     fapp.register_blueprint(auth_bp)
     fapp.register_blueprint(mapa_bp)
     fapp.register_blueprint(profile_bp)
     fapp.register_blueprint(conversaciones_bp)
 
-    # Crear mapa si no existe
     init_mapa(srp)
 
     return fapp, lmanager, srp

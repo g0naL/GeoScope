@@ -5,13 +5,10 @@ import redis
 from country_list import countries_for_language
 import pytz
 
-profile_bp = flask.Blueprint(
-    "profile", __name__,
-    url_prefix='',
-    template_folder="templates",
-    static_folder="static",
-    static_url_path="/profile/static"
-)
+from model.MapEntity import MapEntity
+from model.ConversationEntity import ConversationEntity
+
+profile_bp = flask.Blueprint("profile", __name__,url_prefix='',template_folder="templates",static_folder="static",static_url_path="/profile/static")
 
 @profile_bp.route("/profile/<safe_oid>")
 def profile(safe_oid):
@@ -20,8 +17,7 @@ def profile(safe_oid):
     :param safe_oid: OID seguro del usuario.
     :return: Plantilla HTML con la información del perfil.
     """
-    from model.MapEntity import Mapa
-    from model.ConversationEntity import ConversationEntity
+
 
     country_names = {name: code for code, name in countries_for_language('en')}
 
@@ -36,7 +32,7 @@ def profile(safe_oid):
         country_code = country_names.get(user.country, "aq")
         comentarios_usuario = []
 
-        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
+        mapa = srp.find_first(MapEntity, lambda m: m.id == "world_map")
         if mapa:
             for conflicto in mapa.get_conflictos(srp):
                 for conversacion in conflicto.get_conversaciones(srp):
@@ -68,8 +64,6 @@ def editar_perfil(safe_oid):
     :param safe_oid: OID seguro del usuario.
     :return: Plantilla de edición o redirección según la acción realizada.
     """
-    from model.MapEntity import Mapa
-    from model.UserEntity import UserEntity
 
     country_names = {name: code for code, name in countries_for_language('en')}
 
@@ -90,7 +84,7 @@ def editar_perfil(safe_oid):
                 """Elimina el usuario y todos sus comentarios."""
                 flask_login.logout_user()
 
-                mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
+                mapa = srp.find_first(MapEntity, lambda m: m.id == "world_map")
                 if mapa:
                     for conflicto in mapa.get_conflictos(srp):
                         for conversacion in conflicto.get_conversaciones(srp):

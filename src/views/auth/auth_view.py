@@ -3,11 +3,9 @@ import flask_login
 import redis
 import sirope
 from model.UserEntity import UserEntity
-from werkzeug.security import check_password_hash
 from country_list import countries_for_language
 import pytz
 
-# Creamos el blueprint "auth", como módulo independiente
 auth_bp = flask.Blueprint("auth", __name__, template_folder="templates", static_folder="static", static_url_path="/auth/static")
 
 

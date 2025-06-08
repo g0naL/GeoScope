@@ -2,14 +2,13 @@ import flask
 import redis
 import sirope
 
-from model.MapEntity import Mapa
-from model.ComentaryEntity import Comentario
+from model.MapEntity import MapEntity
+from model.CommentEntity import Comentario
 from model.ConversationEntity import ConversationEntity
 from flask_login import current_user
 
 from model.UserEntity import UserEntity
 
-# Blueprint para las rutas relacionadas con el foro de conversaciones
 conversaciones_bp = flask.Blueprint("conversaciones", __name__, template_folder="templates", static_folder="static", static_url_path="/conversaciones/static")
 
 
@@ -21,7 +20,7 @@ def foro_index():
     """
     try:
         srp = sirope.Sirope()
-        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
+        mapa = srp.find_first(MapEntity, lambda m: m.id == "world_map")
         if not mapa:
             flask.flash("No se encontró el mapa", "danger")
             return flask.redirect(flask.url_for("main.index"))
@@ -46,7 +45,7 @@ def foro_conflicto(conflicto_id):
     """
     try:
         srp = sirope.Sirope()
-        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
+        mapa = srp.find_first(MapEntity, lambda m: m.id == "world_map")
         if not mapa:
             flask.flash("No se encontró el mapa", "danger")
             return flask.redirect(flask.url_for("main.index"))
@@ -98,7 +97,7 @@ def ver_conversacion(conflicto_id, conversation_soid):
     """
     try:
         srp = sirope.Sirope()
-        mapa = srp.find_first(Mapa, lambda m: m.id == "world_map")
+        mapa = srp.find_first(MapEntity, lambda m: m.id == "world_map")
         conflicto = next((c for c in mapa.get_conflictos(srp) if c.id == conflicto_id), None)
         if not conflicto:
             flask.flash("Conflicto no encontrado", "warning")
